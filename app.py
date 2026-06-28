@@ -5,7 +5,7 @@ import pandas as pd
 import statistics
 from collections import defaultdict
 
-# ---------- ОБЩИЕ ФУНКЦИИ (Оставлены без изменений логики) ----------
+# ---------- ОБЩИЕ ФУНКЦИИ (ЛОГИКА АГЕНТА) ----------
 def parse_train_data(tickets):
     trains_data = []
     for train in tickets:
@@ -180,127 +180,191 @@ def analyze_period(from_station, to_station, start_date, days=60, progress_callb
         'total_days': len(daily_stats)
     }
 
-# ---------- НАСТРОЙКА СТРАНИЦЫ И ДИЗАЙН ----------
-st.set_page_config(page_title="SmartTicket | Ассистент путешественника", page_icon="🎫", layout="wide")
+# ---------- НАСТРОЙКА СТРАНИЦЫ И ГЛУБОКИЙ РЕБРЕНДИНГ ДИЗАЙНА ----------
+st.set_page_config(page_title="SmartTicket Pro | Продвинутая аналитика", page_icon="⚡", layout="wide")
 
-# Кастомный CSS для улучшения визуала
+# Инъекция кастомных стилей CSS для полной переработки интерфейса
 st.markdown("""
     <style>
-    /* Улучшение карточек с метриками */
-    div[data-testid="metric-container"] {
-        background-color: #1E1E2E; /* Темно-синий фон карточек для темной темы */
-        border: 1px solid #33334d;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        transition: transform 0.2s ease-in-out;
+    /* 1. Глобальный футуристичный фон приложения */
+    .stApp {
+        background: linear-gradient(135deg, #0d0e15 0%, #16192b 50%, #0d0e15 100%) !important;
+        font-family: 'Inter', -apple-system, sans-serif;
     }
-    div[data-testid="metric-container"]:hover {
-        transform: translateY(-2px);
-        border: 1px solid #FF4B4B;
-    }
-    /* Если включена светлая тема */
-    @media (prefers-color-scheme: light) {
-        div[data-testid="metric-container"] {
-            background-color: #ffffff;
-            border: 1px solid #f0f2f6;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-    }
-    /* Кастомный заголовок сайта */
-    .main-title {
+    
+    /* Скрываем стандартный копирайт и элементы Streamlit, чтобы сайт выглядел авторским */
+    #MainMenu, footer, header {visibility: hidden;}
+    
+    /* 2. Стилизация главного кастомного заголовка */
+    .header-box {
         text-align: center;
-        font-family: 'Helvetica Neue', sans-serif;
-        font-weight: 700;
-        font-size: 3rem;
-        background: -webkit-linear-gradient(45deg, #FF4B4B, #FF8F8F);
+        padding: 40px 10px 20px 10px;
+    }
+    .main-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(45deg, #00f2fe, #4facfe);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0px;
-        padding-bottom: 0px;
+        letter-spacing: -1px;
+        margin-bottom: 5px;
     }
     .sub-title {
-        text-align: center;
-        color: #888888;
-        font-size: 1.1rem;
-        margin-top: -10px;
-        margin-bottom: 30px;
+        color: #7e84a3;
+        font-size: 1.2rem;
+        font-weight: 400;
+    }
+
+    /* 3. Переработка карточек статистики (Метрик) */
+    div[data-testid="metric-container"] {
+        background: rgba(30, 34, 58, 0.6) !important;
+        border: 1px solid rgba(79, 172, 254, 0.3) !important;
+        border-radius: 16px !important;
+        padding: 22px 20px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    div[data-testid="metric-container"]:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px 0 rgba(0, 242, 254, 0.2) !important;
+        border: 1px solid rgba(0, 242, 254, 0.6) !important;
+    }
+    
+    /* Настройка шрифтов внутри карточек */
+    div[data-testid="stMetricValue"] {
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #a0aec0 !important;
+        font-size: 0.95rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* 4. Полная переделка кнопок под неоновый стиль */
+    div.stButton > button:first-child {
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%) !important;
+        color: #0d0e15 !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 12px 24px !important;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3) !important;
+        transition: all 0.25s ease;
+    }
+    div.stButton > button:first-child:hover {
+        transform: scale(1.01);
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5) !important;
+    }
+    div.stButton > button:first-child:active {
+        transform: scale(0.99);
+    }
+
+    /* 5. Настройка контейнеров для полей ввода (Blur эффект) */
+    div[data-testid="stForm"], .stTextInput, .stDateInput, .stSlider {
+        background: rgba(22, 25, 43, 0.7);
+        padding: 10px;
+        border-radius: 12px;
+    }
+    label {
+        color: #cbd5e1 !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Изменение вида вкладок (Tabs) */
+    button[data-baseweb="tab"] {
+        color: #7e84a3 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        transition: color 0.3s ease;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #00f2fe !important;
+        border-bottom-color: #00f2fe !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Отрисовка нового заголовка
-st.markdown("<h1 class='main-title'>🎫 SmartTicket</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-title'>Ваш продвинутый ассистент по поиску и аналитике железнодорожных билетов</p>", unsafe_allow_html=True)
+# Рендеринг нового фирменного блока заголовка
+st.markdown("""
+    <div class="header-box">
+        <h1 class="main-title">⚡ SmartTicket Pro</h1>
+        <p class="sub-title">Аналитическая AI-панель мониторинга и оптимизации пассажирских маршрутов</p>
+    </div>
+""", unsafe_allow_html=True)
 
-st.divider()
+st.write("") 
 
-# Вкладки с новыми названиями
-tab1, tab2, tab3 = st.tabs(["🔍 Умный поиск", "🍀 Счастливый вторник", "📈 Аналитика рынка"])
+# Инициализация стильных вкладок
+tab1, tab2, tab3 = st.tabs(["🔍 Интеллектуальный поиск", "📆 Мониторинг «Вторники»", "📊 Аналитика спроса"])
 
 with tab1:
-    st.markdown("### 🔎 Поиск билетов по маршруту")
+    st.markdown("### 🔎 Поиск рейсов по заданному направлению")
     
-    # Сгруппированные элементы ввода
-    with st.container():
-        col1, col2, col3 = st.columns([2, 2, 1])
-        with col1:
-            from_station = st.text_input("📍 Откуда", value="Санкт-Петербург", key="search_from")
-        with col2:
-            to_station = st.text_input("📍 Куда", value="Москва", key="search_to")
-        with col3:
-            departure_date = st.date_input("📅 Дата", value=date.today(), key="search_date")
+    # Компактный блок параметров ввода
+    col1, col2, col3 = st.columns([2, 2, 1.2])
+    with col1:
+        from_station = st.text_input("📍 Станция отправления", value="Санкт-Петербург", key="search_from")
+    with col2:
+        to_station = st.text_input("🏁 Станция назначения", value="Москва", key="search_to")
+    with col3:
+        departure_date = st.date_input("📅 Дата поездки", value=date.today(), key="search_date")
 
-    st.write("") # Небольшой отступ
-    search_button = st.button("🚀 Найти рейсы", type="primary", use_container_width=True)
+    st.write("")
+    search_button = st.button("🚀 Найти оптимальные билеты", type="primary", use_container_width=True)
 
     if search_button:
         if not from_station or not to_station:
             st.error("❌ Пожалуйста, заполните пункты отправления и назначения.")
         else:
-            with st.spinner(f"⏳ Собираем данные по маршруту '{from_station}' ➔ '{to_station}'..."):
+            with st.spinner("⏳ Подключение к шлюзу данных, агрегация рейсов..."):
                 tickets, actual_date, found = search_trains_with_fallback(from_station, to_station, departure_date, days_range=3)
                 
                 if not found:
-                    st.warning("😔 Поездов не найдено на ближайшие даты (в пределах ±3 дней).")
+                    st.warning("😔 Поездов на выбранные и ближайшие даты не обнаружено.")
                 else:
                     if actual_date != departure_date:
-                        st.info(f"ℹ️ На {departure_date.strftime('%d.%m')} билетов нет. Показаны результаты на **{actual_date.strftime('%d.%m.%Y')}**")
+                        st.info(f"ℹ️ Прямых рейсов на указанную дату нет. Выведены ближайшие доступные варианты на: **{actual_date.strftime('%d.%m.%Y')}**")
                     
                     trains_data = parse_train_data(tickets)
                     if not trains_data:
-                        st.warning("😔 Не удалось получить информацию о ценах.")
+                        st.warning("😔 Информация о тарифной сетке пуста.")
                     else:
                         df = pd.DataFrame(trains_data)
                         df_sorted = df.sort_values('Цена (мин.), ₽')
                         
-                        st.success(f"✅ Успешно! Доступно поездов: {len(df_sorted)}")
+                        st.success(f"📊 Анализ завершен. Найдено актуальных рейсов: {len(df_sorted)}")
                         
-                        # Блок с красивой статистикой
-                        st.markdown("#### 📊 Сводка по билетам")
+                        # Метрики в кастомных неоновых карточках
                         m1, m2, m3 = st.columns(3)
-                        m1.metric("Минимальная цена", f"{df_sorted['Цена (мин.), ₽'].min():.0f} ₽", "Самый выгодный", delta_color="normal")
-                        m2.metric("Максимальная цена", f"{df_sorted['Цена (мин.), ₽'].max():.0f} ₽")
-                        m3.metric("Всего рейсов", len(df_sorted))
+                        m1.metric("Лучшая цена", f"{df_sorted['Цена (мин.), ₽'].min():.0f} ₽", "Самый выгодный")
+                        m2.metric("Максимальный тариф", f"{df_sorted['Цена (мин.), ₽'].max():.0f} ₽")
+                        m3.metric("Доступно поездов", len(df_sorted))
 
-                        st.markdown("#### 📋 Расписание и цены")
+                        st.write("")
+                        st.markdown("#### 📋 Сводная таблица рейсов")
                         st.dataframe(df_sorted, use_container_width=True, hide_index=True)
 
+                        # Стильная кнопка скачивания
                         csv = df_sorted.to_csv(index=False).encode('utf-8-sig')
                         st.download_button(
-                            label="📥 Сохранить отчет (CSV)",
+                            label="📥 Экспортировать выгрузку в CSV",
                             data=csv,
                             file_name=f"smartticket_{from_station}_{to_station}_{actual_date}.csv",
                             mime="text/csv",
                         )
 
 with tab2:
-    st.markdown("### 🍀 Счастливый вторник")
-    st.markdown("Поиск выгодных билетов на маршруте **Москва ➔ Санкт-Петербург** на ближайшие вторники.")
+    st.markdown("### 📆 Автоматический трекер «Счастливый вторник»")
+    st.markdown("Поиск и детекция минимальных цен по стратегическому направлению **Москва ➔ Санкт-Петербург**.")
     
-    with st.container():
-        weeks = st.slider("Глубина поиска (в неделях)", min_value=4, max_value=16, value=8, key="tuesday_weeks")
-        tuesday_button = st.button("🔍 Запустить проверку вторников", type="primary")
+    weeks = st.slider("Глубина сканирования (недель)", min_value=4, max_value=16, value=8, key="tuesday_weeks")
+    tuesday_button = st.button("⚡ Запустить циклическое сканирование вторников", type="primary")
 
     if tuesday_button:
         from_station, to_station = "Москва", "Санкт-Петербург"
@@ -312,7 +376,7 @@ with tab2:
         status_text = st.empty()
 
         for idx, tuesday in enumerate(tuesdays):
-            status_text.text(f"Проверка: {tuesday.strftime('%d.%m.%Y')}...")
+            status_text.markdown(f"📡 *Сканирование квантовых данных на дату:* `{tuesday.strftime('%d.%m.%Y')}`...")
             result, error = find_cheapest_ticket(from_station, to_station, tuesday)
             
             if result:
@@ -326,97 +390,97 @@ with tab2:
                     'Отправление': dep_time,
                     'Прибытие': arr_time,
                     'Цена (мин.), ₽': result['price'],
-                    'Вагоны': car_types
+                    'Класс мест': car_types
                 })
             else:
                 results.append({
                     'Дата': tuesday.strftime('%d.%m.%Y'),
                     'День недели': 'Вторник',
-                    'Поезд': '❌ Нет рейсов',
+                    'Поезд': '❌ Места распроданы / Ошибка',
                     'Отправление': '-',
                     'Прибытие': '-',
                     'Цена (мин.), ₽': None,
-                    'Вагоны': error
+                    'Класс мест': error
                 })
             progress_bar.progress((idx + 1) / len(tuesdays))
 
         status_text.empty()
-        st.success("✅ Проверка завершена!")
+        st.success("✅ Все периоды успешно просканированы!")
         
         df = pd.DataFrame(results)
         st.dataframe(df, use_container_width=True, hide_index=True)
 
         available = df[df['Цена (мин.), ₽'].notna()]
         if not available.empty:
-            st.metric("🔥 Абсолютный минимум за период", f"{available['Цена (мин.), ₽'].min():.0f} ₽")
+            st.write("")
+            st.metric("🎯 Минимальная зафиксированная стоимость", f"{available['Цена (мин.), ₽'].min():.0f} ₽", "Рекомендуется к покупке")
         else:
-            st.warning("😔 Билеты не найдены ни на один из запрошенных вторников.")
+            st.warning("😔 На выбранные вторники свободных мест в системе продаж не найдено.")
 
 with tab3:
-    st.markdown("### 📈 Аналитика спроса")
-    st.markdown("Глубокий анализ загруженности и динамики цен на заданном маршруте.")
+    st.markdown("### 📊 Агент-аналитик спроса и рыночных трендов")
+    st.markdown("Многопоточный сбор статистики загруженности мест для вычисления аномалий спроса.")
     
-    with st.container():
-        col1, col2, col3 = st.columns([2, 2, 1.5])
-        with col1:
-            anal_from = st.text_input("📍 Откуда", value="Курск", key="anal_from")
-        with col2:
-            anal_to = st.text_input("📍 Куда", value="Москва", key="anal_to")
-        with col3:
-            days_analytics = st.slider("Период (дней)", min_value=14, max_value=90, value=14, step=7, key="analytics_days")
+    col1, col2, col3 = st.columns([2, 2, 1.5])
+    with col1:
+        anal_from = st.text_input("📍 Пункт А", value="Москва", key="anal_from")
+    with col2:
+        anal_to = st.text_input("🏁 Пункт Б", value="Санкт-Петербург", key="anal_to")
+    with col3:
+        days_analytics = st.slider("Временной диапазон (дней)", min_value=14, max_value=90, value=14, step=7, key="analytics_days")
     
     st.write("")
-    analytics_button = st.button("🧠 Сгенерировать инсайты", type="primary", use_container_width=True)
+    analytics_button = st.button("🧠 Запустить предиктивный анализ спроса", type="primary", use_container_width=True)
 
     if analytics_button:
         if not anal_from or not anal_to:
-            st.error("❌ Укажите станции отправления и назначения.")
+            st.error("❌ Укажите обе контрольные станции.")
         else:
             start_date = date.today()
-            with st.spinner("⏳ ИИ анализирует массивы данных... Это может занять время."):
+            with st.spinner("⏳ Парсинг исторических срезов мест и вычисление дельт цен..."):
                 progress_bar = st.progress(0)
                 status_text = st.empty()
 
                 def progress_callback(i, total):
                     progress_bar.progress((i + 1) / total)
-                    status_text.markdown(f"**Парсинг данных:** день {i+1} из {total}...")
+                    status_text.markdown(f"🔄 *Анализируется матрица тарифов:* день `{i+1}` из `{total}`...")
 
                 result = analyze_period(anal_from, anal_to, start_date, days_analytics, progress_callback)
                 status_text.empty()
 
-            st.success("✅ Анализ успешно завершен!")
+            st.success("✅ Сводный аналитический отчет сформирован!")
             
-            st.markdown("#### 💡 Ключевые выводы")
+            st.markdown("#### 💡 Результаты макроанализа")
             col1, col2, col3 = st.columns(3)
 
             if result['popular_day']:
                 col1.metric(
-                    "🔥 Пиковый день загрузки",
+                    "🔥 Пиковая нагрузка (Sold Out)",
                     f"{result['popular_day_name']} ({result['popular_day'].strftime('%d.%m')})",
-                    f"Без мест: {result['popular_day_booked']}",
+                    f"{result['popular_day_booked']} поездов без мест",
                     delta_color="inverse"
                 )
             else:
-                col1.metric("🔥 Пиковый день загрузки", "Нет данных")
+                col1.metric("🔥 Пиковая нагрузка", "Недостаточно данных")
 
             if result['cheapest_day']:
                 col2.metric(
-                    "💰 Самый бюджетный день",
+                    "💰 Оптимальное окно покупки",
                     result['cheapest_day'].strftime('%d.%m.%Y'),
-                    f"Средняя цена: {result['cheapest_day_price']:.0f} ₽",
-                    delta_color="normal"
+                    f"Ср. тариф: {result['cheapest_day_price']:.0f} ₽"
                 )
             else:
-                col2.metric("💰 Самый бюджетный день", "Нет данных")
+                col2.metric("💰 Оптимальное окно покупки", "Нет данных")
 
             if result['most_expensive_day']:
                 col3.metric(
-                    "💸 Самый дорогой день",
+                    "💸 Максимальное удорожание",
                     result['most_expensive_day'].strftime('%d.%m.%Y'),
-                    f"Средняя цена: {result['most_expensive_day_price']:.0f} ₽",
+                    f"Ср. тариф: {result['most_expensive_day_price']:.0f} ₽",
                     delta_color="inverse"
                 )
             else:
-                col3.metric("💸 Самый дорогой день", "Нет данных")
+                col3.metric("💸 Максимальное удорожание", "Нет данных")
 
-            st.caption(f"ℹ️ Собрана аналитика за {result['total_days']} дней на основе текущего состояния продаж билетов.")
+            st.write("")
+            st.info(f"📋 Суммарно обработано посуточных срезов: {result['total_days']}. Данные актуальны на текущую минуту.")
