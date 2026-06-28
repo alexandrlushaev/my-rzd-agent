@@ -7,153 +7,291 @@ from collections import defaultdict
 
 # ---------- НАСТРОЙКА СТРАНИЦЫ ----------
 st.set_page_config(
-    page_title="РЖД Агент 2.0",
-    page_icon="🚄",
+    page_title="РЖД Агент",
+    page_icon="🎫",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# ---------- КАСТОМНЫЙ CSS (ТЁМНАЯ ТЕМА) ----------
+# ---------- ПОЛНОСТЬЮ НОВЫЙ CSS (СВЕТЛАЯ ТЕМА) ----------
 st.markdown("""
 <style>
-    /* Общий фон */
+    /* Общий фон и шрифты */
     .stApp {
-        background: radial-gradient(ellipse at 20% 30%, #13203a, #09101e);
+        background: #f5f7fb;
+        font-family: 'Segoe UI', Roboto, sans-serif;
     }
-    /* Карточки */
-    .css-1r6slb0, .css-1v3fvcr, .css-1y4p8pa {
-        background: rgba(255,255,255,0.03) !important;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-        border-radius: 20px !important;
-        padding: 20px !important;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    /* Сайдбар */
+    .css-1d391kg {
+        background: #ffffff !important;
+        border-right: 1px solid #e9ecf0 !important;
+        padding-top: 2rem !important;
+        box-shadow: 2px 0 12px rgba(0,0,0,0.02);
     }
-    /* Заголовки */
-    h1, h2, h3, .stMarkdown {
-        color: #f0f2f8 !important;
+    .css-1d391kg .css-1v3fvcr {
+        background: transparent !important;
     }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: rgba(255,255,255,0.04);
-        border-radius: 16px;
-        padding: 4px;
-        border: 1px solid rgba(255,255,255,0.04);
+    /* Заголовок в сайдбаре */
+    .sidebar-header {
+        padding: 0 1rem 1.5rem 1rem;
+        border-bottom: 1px solid #eef1f5;
+        margin-bottom: 1.5rem;
     }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 12px !important;
-        padding: 10px 24px !important;
-        font-weight: 600 !important;
-        color: rgba(255,255,255,0.5) !important;
-        transition: all 0.25s ease;
+    .sidebar-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        letter-spacing: -0.5px;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background: linear-gradient(135deg, #1e3050, #0f1a30) !important;
-        color: white !important;
-        border: 1px solid rgba(212,175,55,0.15) !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+    .sidebar-header small {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 400;
+        display: block;
+        margin-top: 0.2rem;
+    }
+    /* Радио-кнопки в сайдбаре (кастом) */
+    .stRadio > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    .stRadio label {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 0.7rem 1.2rem;
+        border: 1px solid #e9ecf0;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: #334155;
+        cursor: pointer;
+    }
+    .stRadio label:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .stRadio label[data-baseweb="radio"] {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+    /* Переопределяем выбранный элемент */
+    .stRadio div[role="radiogroup"] > label {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.7rem 1.2rem;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e9ecf0;
+        font-weight: 500;
+        color: #334155;
+        transition: all 0.2s;
+    }
+    .stRadio div[role="radiogroup"] > label[data-checked="true"] {
+        background: #e0f2fe;
+        border-color: #38bdf8;
+        color: #0369a1;
+        box-shadow: 0 2px 8px rgba(56, 189, 248, 0.15);
+    }
+    /* Карточки контента */
+    .content-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 1.8rem 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.02);
+        border: 1px solid #edf2f7;
+        margin-bottom: 1.8rem;
+    }
+    /* Заголовки страниц */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+    }
+    .page-header h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+    .page-header .icon {
+        font-size: 2rem;
+    }
+    .page-desc {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 1.8rem;
+        border-left: 3px solid #38bdf8;
+        padding-left: 1rem;
+    }
+    /* Поля ввода */
+    .stTextInput input, .stDateInput input, .stSelectbox select {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 14px !important;
+        padding: 0.8rem 1.2rem !important;
+        font-size: 1rem !important;
+        color: #0f172a !important;
+        transition: all 0.2s;
+    }
+    .stTextInput input:focus, .stDateInput input:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+        background: #ffffff !important;
     }
     /* Кнопки */
     .stButton button {
-        background: linear-gradient(135deg, #d4af37, #b8922e) !important;
-        color: #0b1424 !important;
-        font-weight: 700 !important;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+        color: white !important;
+        font-weight: 600 !important;
         border: none !important;
         border-radius: 14px !important;
-        padding: 12px 32px !important;
-        box-shadow: 0 8px 24px rgba(212,175,55,0.20);
-        transition: all 0.25s ease;
+        padding: 0.8rem 2.5rem !important;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        letter-spacing: 0.3px;
     }
     .stButton button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 32px rgba(212,175,55,0.30);
-        background: linear-gradient(135deg, #e2c14a, #c49f33) !important;
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35) !important;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9) !important;
+    }
+    .stButton button:active {
+        transform: scale(0.97);
     }
     /* Метрики */
     .css-1xarl3l {
-        background: rgba(255,255,255,0.03) !important;
-        border-radius: 16px !important;
-        padding: 16px !important;
-        border: 1px solid rgba(255,255,255,0.04) !important;
+        background: #f8fafc !important;
+        border-radius: 18px !important;
+        padding: 1.2rem 1rem !important;
+        border: 1px solid #e2e8f0 !important;
         text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .css-1xarl3l .css-1r4brx7 {
-        font-size: 28px !important;
+        font-size: 1.8rem !important;
         font-weight: 700 !important;
-        background: linear-gradient(135deg, #f6e6b0, #d4af37);
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
+        color: #0f172a !important;
+    }
+    .css-1xarl3l .css-1p1fhlq {
+        color: #64748b !important;
+        font-size: 0.9rem !important;
     }
     /* Таблицы */
     .dataframe {
         background: transparent !important;
-        border-collapse: collapse !important;
+        border-collapse: separate !important;
+        border-spacing: 0 4px !important;
     }
     .dataframe th {
-        background: rgba(255,255,255,0.03) !important;
-        color: rgba(255,255,255,0.5) !important;
+        background: #f1f5f9 !important;
+        color: #334155 !important;
         font-weight: 600 !important;
-        font-size: 12px !important;
+        font-size: 0.8rem !important;
         text-transform: uppercase !important;
-        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-        padding: 12px 16px !important;
+        letter-spacing: 0.5px;
+        padding: 0.8rem 1rem !important;
+        border: none !important;
+        border-radius: 12px 12px 0 0 !important;
     }
     .dataframe td {
-        color: rgba(255,255,255,0.85) !important;
-        border-bottom: 1px solid rgba(255,255,255,0.03) !important;
-        padding: 10px 16px !important;
+        background: #ffffff !important;
+        color: #1e293b !important;
+        padding: 0.8rem 1rem !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    .dataframe tr:last-child td {
+        border-bottom: none;
     }
     .dataframe tr:hover td {
-        background: rgba(255,255,255,0.02) !important;
+        background: #f8fafc !important;
     }
-    /* Поля ввода */
-    .stTextInput input, .stDateInput input, .stSelectbox select {
-        background: rgba(255,255,255,0.05) !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        border-radius: 12px !important;
-        color: #f0f2f8 !important;
-        padding: 14px 18px !important;
-    }
-    .stTextInput input:focus, .stDateInput input:focus {
-        border-color: rgba(212,175,55,0.4) !important;
-        box-shadow: 0 0 0 3px rgba(212,175,55,0.08) !important;
-    }
-    /* Прогресс-бар */
+    /* Прогресс */
     .stProgress > div > div {
-        background: linear-gradient(90deg, #d4af37, #f6e6b0) !important;
+        background: linear-gradient(90deg, #0ea5e9, #38bdf8) !important;
+        border-radius: 100px !important;
     }
-    /* Логотип и заголовок */
-    .custom-header {
+    /* Инфо/успех/ошибка */
+    .stAlert {
+        border-radius: 14px !important;
+        border: none !important;
+        background: #f8fafc !important;
+        padding: 1rem 1.5rem !important;
+        border-left: 4px solid #38bdf8 !important;
+    }
+    .stAlert[data-baseweb="notification"] {
+        background: #f1f5f9 !important;
+    }
+    /* Слайдер */
+    .stSlider {
+        padding: 0.5rem 0;
+    }
+    .stSlider > div > div {
+        background: #e2e8f0 !important;
+        border-radius: 100px !important;
+        height: 4px !important;
+    }
+    .stSlider > div > div > div {
+        background: #0ea5e9 !important;
+    }
+    .stSlider > div > div > div > div {
+        background: #0ea5e9 !important;
+        width: 18px !important;
+        height: 18px !important;
+        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
+    }
+    /* Скачивание */
+    .stDownloadButton button {
+        background: #f1f5f9 !important;
+        color: #1e293b !important;
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 0.6rem 1.5rem !important;
+    }
+    .stDownloadButton button:hover {
+        background: #e2e8f0 !important;
+        transform: none !important;
+    }
+    /* Footer (внизу) */
+    .footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #edf2f7;
+        color: #94a3b8;
+        font-size: 0.85rem;
         display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 20px;
-    }
-    .custom-header h1 {
-        font-size: 26px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #f6e6b0, #d4af37);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .custom-header small {
-        color: rgba(255,255,255,0.3);
-        font-size: 14px;
-        font-weight: 400;
-        -webkit-text-fill-color: rgba(255,255,255,0.3);
+        justify-content: space-between;
+        flex-wrap: wrap;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- КАСТОМНЫЙ ЗАГОЛОВОК (меняем «ссылку» / брендинг) ----------
-st.markdown("""
-<div class="custom-header">
-    <span style="font-size:36px;">🚄</span>
-    <h1>РЖД Агент <small>· умный поиск</small></h1>
-</div>
-""", unsafe_allow_html=True)
+# ---------- БОКОВАЯ ПАНЕЛЬ (НАВИГАЦИЯ) ----------
+with st.sidebar:
+    st.markdown("""
+    <div class="sidebar-header">
+        <h1>🎫 РЖД Агент</h1>
+        <small>умный поиск билетов</small>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    mode = st.radio(
+        "Выберите режим",
+        options=["🔍 Поиск билетов", "😊 Счастливый вторник", "📊 Аналитик спроса"],
+        index=0,
+        label_visibility="collapsed"
+    )
+    st.sidebar.markdown("---")
+    st.sidebar.caption("Данные предоставлены ticket.rzd.ru")
+    st.sidebar.caption("Версия 2.0 · интерфейс обновлён")
 
-# ---------- ОБЩИЕ ФУНКЦИИ (ваши, без изменений) ----------
+# ---------- ОБЩИЕ ФУНКЦИИ (без изменений) ----------
 def parse_train_data(tickets):
     trains_data = []
     for train in tickets:
@@ -164,16 +302,12 @@ def parse_train_data(tickets):
             if group_min_price is not None:
                 if min_price is None or group_min_price < min_price:
                     min_price = group_min_price
-
         if min_price is None:
             continue
-
         dep_time = train.get('DepartureDateTime') or train.get('LocalDepartureDateTime')
         arr_time = train.get('ArrivalDateTime') or train.get('LocalArrivalDateTime')
         train_name = train.get('TrainName') or train.get('TrainDescription') or ''
-
         car_types = sorted(set(g.get('CarTypeName', '') for g in car_groups if g.get('MinPrice') is not None))
-
         trains_data.append({
             'Номер': train.get('TrainNumber') or train.get('DisplayTrainNumber') or '—',
             'Название': train_name,
@@ -223,10 +357,8 @@ def find_cheapest_ticket(from_station, to_station, departure_date):
         )
     except Exception as e:
         return None, str(e)
-
     if not tickets:
         return None, "Нет поездов"
-
     min_price = None
     best_train = None
     for train in tickets:
@@ -244,7 +376,6 @@ def find_cheapest_ticket(from_station, to_station, departure_date):
                         'price': min_price,
                         'car_types': sorted(set(g.get('CarTypeName', '') for g in car_groups if g.get('MinPrice') is not None))
                     }
-
     if best_train:
         return best_train, None
     else:
@@ -258,12 +389,10 @@ def analyze_period(from_station, to_station, start_date, days=60, progress_callb
         'min_prices': [],
         'day_name': ''
     })
-
     current_date = start_date
     for i in range(days):
         if progress_callback:
             progress_callback(i, days)
-
         try:
             tickets = client.search_tickets(
                 from_station=from_station,
@@ -273,10 +402,8 @@ def analyze_period(from_station, to_station, start_date, days=60, progress_callb
         except Exception:
             current_date += timedelta(days=1)
             continue
-
         day_name = current_date.strftime('%A')
         daily_stats[current_date]['day_name'] = day_name
-
         for train in tickets:
             daily_stats[current_date]['total_trains'] += 1
             car_groups = train.get('CarGroups', [])
@@ -289,34 +416,27 @@ def analyze_period(from_station, to_station, start_date, days=60, progress_callb
                 if group_min is not None:
                     if min_price is None or group_min < min_price:
                         min_price = group_min
-
             if not has_places or train.get('IsWaitListAvailable', False):
                 daily_stats[current_date]['fully_booked'] += 1
-
             if min_price is not None:
                 daily_stats[current_date]['min_prices'].append(min_price)
-
         current_date += timedelta(days=1)
-
     best_day = None
     max_booked = -1
     for d, stats in daily_stats.items():
         if stats['fully_booked'] > max_booked:
             max_booked = stats['fully_booked']
             best_day = d
-
     day_avg_prices = {}
     for d, stats in daily_stats.items():
         if stats['min_prices']:
             avg_price = statistics.mean(stats['min_prices'])
             day_avg_prices[d] = avg_price
-
     if day_avg_prices:
         cheapest_day = min(day_avg_prices, key=day_avg_prices.get)
         most_expensive_day = max(day_avg_prices, key=day_avg_prices.get)
     else:
         cheapest_day = most_expensive_day = None
-
     return {
         'popular_day': best_day,
         'popular_day_name': daily_stats[best_day]['day_name'] if best_day else None,
@@ -328,25 +448,32 @@ def analyze_period(from_station, to_station, start_date, days=60, progress_callb
         'total_days': len(daily_stats)
     }
 
-# ---------- ИНТЕРФЕЙС (3 ВКЛАДКИ) ----------
-tab1, tab2, tab3 = st.tabs(["🔍 Поиск билетов", "😊 Счастливый вторник", "📊 Аналитик спроса"])
+# ---------- ОСНОВНОЙ КОНТЕНТ (в зависимости от режима) ----------
+st.markdown('<div class="content-card">', unsafe_allow_html=True)
 
-# --- Вкладка 1: Поиск ---
-with tab1:
-    st.header("🔍 Поиск билетов по маршруту")
+if mode == "🔍 Поиск билетов":
+    st.markdown("""
+    <div class="page-header">
+        <span class="icon">🔍</span>
+        <h2>Поиск билетов</h2>
+    </div>
+    <div class="page-desc">Найдите все поезда по маршруту на нужную дату. Результаты отсортированы по возрастанию цены.</div>
+    """, unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     with col1:
         from_station = st.text_input("📍 Станция отправления", value="Санкт-Петербург", key="search_from")
         to_station = st.text_input("📍 Станция назначения", value="Москва", key="search_to")
     with col2:
         departure_date = st.date_input("📅 Дата отправления", value=date.today(), key="search_date")
+        st.write("")  # отступ
         search_button = st.button("🔍 Найти поезда", type="primary", use_container_width=True)
 
     if search_button:
         if not from_station or not to_station:
             st.error("❌ Пожалуйста, заполните все поля.")
         else:
-            with st.spinner(f"⏳ Ищем поезда из '{from_station}' в '{to_station}' на {departure_date.strftime('%d.%m.%Y')}..."):
+            with st.spinner(f"Ищем поезда из '{from_station}' в '{to_station}' на {departure_date.strftime('%d.%m.%Y')}..."):
                 tickets, actual_date, found = search_trains_with_fallback(from_station, to_station, departure_date, days_range=3)
                 if not found:
                     st.warning("😔 Поездов не найдено на ближайшие даты (в пределах ±3 дней). Попробуйте другой маршрут или дату.")
@@ -375,10 +502,15 @@ with tab1:
                             mime="text/csv",
                         )
 
-# --- Вкладка 2: Счастливый вторник ---
-with tab2:
-    st.header("😊 Счастливый вторник")
-    st.markdown("Проверяем наличие билетов по маршруту **Москва → Санкт-Петербург** на все ближайшие вторники.")
+elif mode == "😊 Счастливый вторник":
+    st.markdown("""
+    <div class="page-header">
+        <span class="icon">😊</span>
+        <h2>Счастливый вторник</h2>
+    </div>
+    <div class="page-desc">Проверяем наличие билетов по маршруту <strong>Москва → Санкт-Петербург</strong> на все ближайшие вторники.</div>
+    """, unsafe_allow_html=True)
+    
     weeks = st.slider("Количество недель для проверки", min_value=4, max_value=16, value=8, key="tuesday_weeks")
     tuesday_button = st.button("🔍 Найти билеты на вторники", type="primary", use_container_width=True)
 
@@ -431,10 +563,15 @@ with tab2:
         else:
             st.warning("😔 Билеты не найдены ни на один вторник.")
 
-# --- Вкладка 3: Аналитик ---
-with tab3:
-    st.header("📊 Аналитик спроса")
-    st.markdown("Анализируем спрос по заданному маршруту за выбранный период.")
+else:  # Аналитик спроса
+    st.markdown("""
+    <div class="page-header">
+        <span class="icon">📊</span>
+        <h2>Аналитик спроса</h2>
+    </div>
+    <div class="page-desc">Анализируем спрос по заданному маршруту за выбранный период. Определяем популярные, дешёвые и дорогие дни.</div>
+    """, unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     with col1:
         anal_from = st.text_input("📍 Станция отправления", value="Москва", key="anal_from")
@@ -448,7 +585,7 @@ with tab3:
             st.error("❌ Пожалуйста, укажите обе станции.")
         else:
             start_date = date.today()
-            with st.spinner(f"⏳ Анализируем спрос за {days_analytics} дней... Это может занять несколько минут."):
+            with st.spinner(f"Анализируем спрос за {days_analytics} дней... Это может занять несколько минут."):
                 progress_bar = st.progress(0)
                 status_text = st.empty()
 
@@ -490,3 +627,13 @@ with tab3:
                 col3.metric("💸 Самый дорогой день", "Нет данных")
 
             st.info(f"📌 Всего обработано дней: {result['total_days']}")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------- ПОДВАЛ ----------
+st.markdown("""
+<div class="footer">
+    <span>© 2026 РЖД Агент · данные ticket.rzd.ru</span>
+    <span>⚡ версия 2.0 · дизайн обновлён</span>
+</div>
+""", unsafe_allow_html=True)
